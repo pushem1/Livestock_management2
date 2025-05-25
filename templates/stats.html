@@ -1,0 +1,69 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Statistics</h2>
+<div class="row mb-4">
+  <div class="col-md-3">
+    <div class="card text-white bg-primary mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Total Livestock</h5>
+        <p class="card-text display-4">{{ total }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-success mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Verified</h5>
+        <p class="card-text display-4">{{ verified }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-warning mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Unverified</h5>
+        <p class="card-text display-4">{{ unverified }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-3">
+    <div class="card text-white bg-info mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Most Common Type</h5>
+        <p class="card-text display-4">{{ most_common or 'N/A' }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<div class="card mb-4">
+  <div class="card-body">
+    <h5 class="card-title">Livestock Distribution by Type</h5>
+    <canvas id="typeChart" width="400" height="200"></canvas>
+  </div>
+</div>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  fetch('/api/type_distribution')
+    .then(response => response.json())
+    .then(data => {
+      const ctx = document.getElementById('typeChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'pie',
+        data: {
+          labels: Object.keys(data),
+          datasets: [{
+            data: Object.values(data),
+            backgroundColor: [
+              '#007bff', '#28a745', '#ffc107', '#17a2b8', '#6c757d', '#dc3545', '#fd7e14'
+            ]
+          }]
+        },
+        options: {
+          responsive: true,
+          legend: { position: 'bottom' }
+        }
+      });
+    });
+});
+</script>
+{% endblock %} 

@@ -1,0 +1,127 @@
+body {
+  background: linear-gradient(to bottom, #d0f5d8 0%, #f4f8f4 100%);
+  color: #234d20;
+  position: relative;
+  padding-bottom: 80px;
+  min-height: 100vh;
+}
+body::before {
+  content: '';
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: url('/static/ChatGPT Image May 25, 2025, 01_59_45 AM.png') repeat 120px 120px;
+  background-size: 90px 90px;
+  opacity: 0.07;
+  pointer-events: none;
+  z-index: 0;
+  filter: hue-rotate(70deg) saturate(2) brightness(1.1);
+}
+.container, .navbar, .card, .table, form, .alert {
+  position: relative;
+  z-index: 1;
+}
+
+.navbar {
+  background: linear-gradient(90deg, #388e3c 0%, #66bb6a 100%);
+  box-shadow: 0 2px 8px rgba(56,142,60,0.08);
+}
+.navbar .navbar-brand, .navbar .nav-link {
+  color: #fff !important;
+  font-weight: 500;
+}
+.navbar .nav-link.active, .navbar .nav-link:hover {
+  color: #dcedc8 !important;
+}
+
+.card {
+  border-radius: 1rem;
+  box-shadow: 0 2px 12px rgba(56,142,60,0.07);
+}
+.bg-primary, .card.bg-primary {
+  background: linear-gradient(135deg, #43a047 0%, #81c784 100%) !important;
+  border: none;
+}
+.bg-success, .card.bg-success {
+  background: linear-gradient(135deg, #388e3c 0%, #66bb6a 100%) !important;
+  border: none;
+}
+.bg-warning, .card.bg-warning {
+  background: linear-gradient(135deg, #fbc02d 0%, #fff176 100%) !important;
+  color: #795548 !important;
+  border: none;
+}
+.bg-info, .card.bg-info {
+  background: linear-gradient(135deg, #009688 0%, #4dd0e1 100%) !important;
+  border: none;
+}
+
+.btn-primary, .btn-success {
+  background: linear-gradient(90deg, #388e3c 0%, #66bb6a 100%);
+  border: none;
+  color: #fff;
+  font-weight: 500;
+  border-radius: 0.5rem;
+  box-shadow: 0 2px 6px rgba(56,142,60,0.08);
+}
+.btn-primary:hover, .btn-success:hover {
+  background: linear-gradient(90deg, #2e7031 0%, #388e3c 100%);
+}
+
+.table thead {
+  background: #388e3c;
+  color: #fff;
+}
+
+.badge-success {
+  background: #43a047 !important;
+}
+.badge-secondary {
+  background: #bdbdbd !important;
+}
+
+input:focus, select:focus, button:focus {
+  outline: 2px solid #66bb6a !important;
+  box-shadow: 0 0 0 2px #c8e6c9 !important;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #66bb6a;
+  border-radius: 8px;
+}
+::-webkit-scrollbar-track {
+  background: #f4f8f4;
+}
+
+@media (min-width: 900px) {
+  body::after {
+    content: '';
+    position: fixed;
+    top: 30px;
+    right: 30px;
+    width: 420px;
+    height: 420px;
+    background: url('/static/ChatGPT Image May 25, 2025, 01_59_45 AM.png') no-repeat center center;
+    background-size: contain;
+    opacity: 0.025;
+    pointer-events: none;
+    z-index: 0;
+    filter: hue-rotate(70deg) saturate(2) brightness(1.1);
+    mix-blend-mode: lighten;
+  }
+}
+
+footer.site-footer {
+  width: 100%;
+  background: linear-gradient(90deg, #388e3c 0%, #66bb6a 100%);
+  color: #fff;
+  text-align: center;
+  padding: 24px 0 16px 0;
+  font-size: 1.1rem;
+  font-weight: 500;
+  box-shadow: 0 -2px 12px rgba(56,142,60,0.07);
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 10;
+} 

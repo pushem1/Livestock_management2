@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Dashboard</h2>
+<div class="row mb-4">
+  <div class="col-md-4">
+    <div class="card text-white bg-primary mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Total Livestock</h5>
+        <p class="card-text display-4">{{ total }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-white bg-success mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Verified</h5>
+        <p class="card-text display-4">{{ verified }}</p>
+      </div>
+    </div>
+  </div>
+  <div class="col-md-4">
+    <div class="card text-white bg-warning mb-3">
+      <div class="card-body">
+        <h5 class="card-title">Unverified</h5>
+        <p class="card-text display-4">{{ unverified }}</p>
+      </div>
+    </div>
+  </div>
+</div>
+<h4>Latest Entries</h4>
+<table class="table table-striped table-bordered">
+  <thead class="thead-light">
+    <tr>
+      <th>ID</th>
+      <th>Farmer</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Date</th>
+      <th>Verified?</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for entry in latest %}
+    <tr>
+      <td>{{ entry.id }}</td>
+      <td>{{ entry.farmer }}</td>
+      <td>{{ entry.type }}</td>
+      <td>{{ entry.quantity }}</td>
+      <td>{{ entry.date }}</td>
+      <td>{% if entry.verified %}<span class="badge badge-success">Yes</span>{% else %}<span class="badge badge-secondary">No</span>{% endif %}</td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %} 

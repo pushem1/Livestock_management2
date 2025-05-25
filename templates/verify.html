@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% block content %}
+<h2 class="mb-4">Verify / Remove Livestock</h2>
+<div class="form-group">
+  <input type="text" class="form-control" id="filterInput" placeholder="Filter by farmer or type...">
+</div>
+<table class="table table-bordered table-striped" id="livestockTable">
+  <thead class="thead-light">
+    <tr>
+      <th>ID</th>
+      <th>Farmer</th>
+      <th>Type</th>
+      <th>Quantity</th>
+      <th>Date</th>
+      <th>Verified?</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody id="tableBody">
+    {% for entry in entries %}
+    <tr data-id="{{ entry.id }}">
+      <td>{{ entry.id }}</td>
+      <td>{{ entry.farmer }}</td>
+      <td>{{ entry.type }}</td>
+      <td>{{ entry.quantity }}</td>
+      <td>{{ entry.date }}</td>
+      <td>{% if entry.verified %}<span class="badge badge-success">Yes</span>{% else %}<span class="badge badge-secondary">No</span>{% endif %}</td>
+      <td>
+        {% if not entry.verified %}
+        <button class="btn btn-sm btn-success verify-btn">Verify</button>
+        {% endif %}
+        <button class="btn btn-sm btn-danger remove-btn">Remove</button>
+      </td>
+    </tr>
+    {% endfor %}
+  </tbody>
+</table>
+<script>
+// Table filtering and AJAX actions handled in static/custom.js
+</script>
+{% endblock %} 
