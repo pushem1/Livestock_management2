@@ -99,4 +99,25 @@ document.addEventListener('DOMContentLoaded', function() {
       }
     });
   }
+
+  // --- Real-time RFID Scan Alerts (Dashboard) ---
+  if (window.location.pathname === "/") {
+    var rfidAlerts = document.getElementById('rfid-alerts');
+    var socket = io();
+    socket.on('rfid_scanned', function(data) {
+      var alert = document.createElement('div');
+      alert.className = 'alert alert-info alert-dismissible fade show';
+      alert.role = 'alert';
+      alert.innerHTML = `<strong>RFID Scanned:</strong> ${data.rfid}
+        <button type="button" class="close" data-dismiss="alert" aria-label="Close">
+          <span aria-hidden="true">&times;</span>
+        </button>`;
+      if (rfidAlerts) {
+        rfidAlerts.prepend(alert);
+      }
+      setTimeout(function() {
+        if (alert.parentNode) alert.parentNode.removeChild(alert);
+      }, 8000);
+    });
+  }
 }); 

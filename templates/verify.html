@@ -1,39 +1,72 @@
 {% extends 'base.html' %}
 {% block content %}
 <h2 class="mb-4">Verify / Remove Livestock</h2>
+
+<h5>Livestock Count by Farmer</h5>
+<div class="row">
+    {% for farmer_name, data in summary.items() %}
+    <div class="col-md-6 mb-4">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="mb-0">{{ farmer_name }}</h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-8">
+                        <h6>Livestock by Type:</h6>
+                        {% for type, type_data in data.types.items() %}
+                        <div class="mb-2">
+                            <span class="badge badge-primary">{{ type }}</span>
+                            <span class="ml-2">
+                                Count: {{ type_data.count }} | 
+                                Quantity: {{ type_data.quantity }}
+                            </span>
+                        </div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-4 text-right">
+                        <h6>Total Animals: {{ data.total_animals }}</h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
 <div class="form-group">
-  <input type="text" class="form-control" id="filterInput" placeholder="Filter by farmer or type...">
+    <input type="text" class="form-control" id="filterInput" placeholder="Filter by farmer or type...">
 </div>
 <table class="table table-bordered table-striped" id="livestockTable">
-  <thead class="thead-light">
-    <tr>
-      <th>ID</th>
-      <th>Farmer</th>
-      <th>Type</th>
-      <th>Quantity</th>
-      <th>Date</th>
-      <th>Verified?</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody id="tableBody">
-    {% for entry in entries %}
-    <tr data-id="{{ entry.id }}">
-      <td>{{ entry.id }}</td>
-      <td>{{ entry.farmer }}</td>
-      <td>{{ entry.type }}</td>
-      <td>{{ entry.quantity }}</td>
-      <td>{{ entry.date }}</td>
-      <td>{% if entry.verified %}<span class="badge badge-success">Yes</span>{% else %}<span class="badge badge-secondary">No</span>{% endif %}</td>
-      <td>
-        {% if not entry.verified %}
-        <button class="btn btn-sm btn-success verify-btn">Verify</button>
-        {% endif %}
-        <button class="btn btn-sm btn-danger remove-btn">Remove</button>
-      </td>
-    </tr>
-    {% endfor %}
-  </tbody>
+    <thead class="thead-light">
+        <tr>
+            <th>ID</th>
+            <th>Farmer</th>
+            <th>Type</th>
+            <th>Quantity</th>
+            <th>Date</th>
+            <th>Verified?</th>
+            <th>Actions</th>
+        </tr>
+    </thead>
+    <tbody id="tableBody">
+        {% for entry in entries %}
+        <tr data-id="{{ entry.id }}">
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.farmer_name or entry.farmer }}</td>
+            <td>{{ entry.type }}</td>
+            <td>{{ entry.quantity }}</td>
+            <td>{{ entry.date }}</td>
+            <td>{% if entry.verified %}<span class="badge badge-success">Yes</span>{% else %}<span class="badge badge-secondary">No</span>{% endif %}</td>
+            <td>
+                {% if not entry.verified %}
+                <button class="btn btn-sm btn-success verify-btn">Verify</button>
+                {% endif %}
+                <button class="btn btn-sm btn-danger remove-btn">Remove</button>
+            </td>
+        </tr>
+        {% endfor %}
+    </tbody>
 </table>
 <script>
 // Table filtering and AJAX actions handled in static/custom.js
