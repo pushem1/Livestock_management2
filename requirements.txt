@@ -1,2 +1,4 @@
 Flask==2.2.5
-Flask-SocketIO 
+Flask-SocketIO
+pymongo
+python-dotenv 

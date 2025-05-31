@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}All Devices - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4" style="color:#388e3c;">All Devices</h2>
+    <div class="card" style="border-top: 3px solid #388e3c;">
+        <div class="card-header" style="background:#e8f5e9; color:#388e3c;">
+            <h5 class="mb-0">Devices List</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead style="background:#c8e6c9;">
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Status</th>
+                            <th>Owner</th>
+                            <th>Last Seen</th>
+                            <th>Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for device in devices %}
+                        <tr>
+                            <td>{{ device.device_id }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if device.status == 'active' else 'danger' }}">
+                                    {{ device.status }}
+                                </span>
+                            </td>
+                            <td>{{ device.owner_name }}</td>
+                            <td>
+                              {% set last = device.last_seen if 'last_seen' in device else (device.lastSeen if 'lastSeen' in device else None) %}
+                              {% if last %}
+                                {{ last.strftime('%Y-%m-%d %H:%M') }}
+                              {% else %}
+                                Unknown
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% set created = device.created_at if 'created_at' in device else (device.createdAt if 'createdAt' in device else None) %}
+                              {% if created %}
+                                {{ created.strftime('%Y-%m-%d') }}
+                              {% else %}
+                                Unknown
+                              {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

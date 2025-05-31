@@ -1,0 +1,69 @@
+{% extends "base.html" %}
+
+{% block title %}Login - Livestock Management{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center mt-5">
+        <div class="col-md-6 col-lg-4">
+            <div class="card shadow" style="border-top: 4px solid #388e3c;">
+                <div class="card-body">
+                    <div class="text-center mb-2">
+                        <i class="fas fa-leaf fa-2x" style="color:#43a047;"></i>
+                    </div>
+                    <h3 class="text-center mb-4" style="color:#388e3c;">Login</h3>
+                    <form id="loginForm">
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input type="email" class="form-control" id="email" name="email" required>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Password</label>
+                            <input type="password" class="form-control" id="password" name="password" required>
+                        </div>
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-success">Login</button>
+                        </div>
+                    </form>
+                    <div class="text-center mt-3">
+                        <p>Don't have an account? <a href="/register" style="color:#388e3c;">Register</a></p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('loginForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const data = {
+        email: document.getElementById('email').value,
+        password: document.getElementById('password').value
+    };
+
+    fetch('/login', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.token) {
+            window.location.href = '/';
+        } else {
+            alert(data.error || 'Login failed');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('An error occurred during login');
+    });
+});
+</script>
+{% endblock %} 

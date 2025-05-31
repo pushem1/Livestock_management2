@@ -1,0 +1,299 @@
+{% extends "base.html" %}
+
+{% block title %}User Dashboard - Livestock Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-2" style="color:#388e3c;">Welcome, {{ current_user.name }}!</h2>
+    <h5 class="mb-4" style="color:#4caf50;">Your Farmer Dashboard</h5>
+    
+    <!-- Animal Type Statistics Chart -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm" style="border-left: 5px solid #43a047;">
+                <div class="card-body">
+                    <h5 class="card-title" style="color:#388e3c;">Animal Type Distribution</h5>
+                    <canvas id="animalTypeChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Quick Stats -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-4 mb-3">
+                    <div class="card text-white" style="background:#388e3c;">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Animals</h5>
+                            <h2 class="card-text">{{ animals|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-white" style="background:#43a047;">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Devices</h5>
+                            <h2 class="card-text">{{ devices|selectattr('status', 'equalto', 'active')|list|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-4 mb-3">
+                    <div class="card text-white" style="background:#66bb6a;">
+                        <div class="card-body">
+                            <h5 class="card-title">Verified Animals</h5>
+                            <h2 class="card-text">{{ animals|selectattr('status', 'equalto', 'verified')|list|length }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Animals -->
+    <div class="card mb-4" style="border-top: 3px solid #388e3c;">
+        <div class="card-header d-flex justify-content-between align-items-center" style="background:#e8f5e9;">
+            <h5 class="mb-0" style="color:#388e3c;">My Animals</h5>
+            <button class="btn btn-success btn-sm" onclick="showAddAnimal()">
+                <i class="fas fa-plus"></i> Add Animal
+            </button>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead style="background:#c8e6c9;">
+                        <tr>
+                            <th>Name</th>
+                            <th>RFID</th>
+                            <th>Type</th>
+                            <th>Status</th>
+                            <th>Last Updated</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for animal in animals %}
+                        <tr>
+                            <td>{{ animal.name }}</td>
+                            <td>{{ animal.rfid }}</td>
+                            <td>{{ animal.type }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if animal.status == 'verified' else 'warning' }}">
+                                    {{ animal.status }}
+                                </span>
+                            </td>
+                            <td>{{ animal.updated_at.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="editAnimal('{{ animal._id }}')">
+                                    <i class="fas fa-edit"></i>
+                                </button>
+                                <button class="btn btn-sm btn-danger" onclick="deleteAnimal('{{ animal._id }}')">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Devices -->
+    <div class="card" style="border-top: 3px solid #43a047;">
+        <div class="card-header" style="background:#e8f5e9;">
+            <h5 class="mb-0" style="color:#388e3c;">My Devices</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead style="background:#c8e6c9;">
+                        <tr>
+                            <th>Device ID</th>
+                            <th>Status</th>
+                            <th>Last Seen</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for device in devices %}
+                        <tr>
+                            <td>{{ device.device_id }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if device.status == 'active' else 'danger' }}">
+                                    {{ device.status }}
+                                </span>
+                            </td>
+                            <td>{{ device.last_seen.strftime('%Y-%m-%d %H:%M') }}</td>
+                            <td>
+                                <button class="btn btn-sm btn-info" onclick="viewDeviceDetails('{{ device._id }}')">
+                                    <i class="fas fa-info-circle"></i>
+                                </button>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Add Animal Modal -->
+<div class="modal fade" id="addAnimalModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Add New Animal</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <form id="addAnimalForm">
+                    <div class="mb-3">
+                        <label class="form-label">Name</label>
+                        <input type="text" class="form-control" name="name" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">RFID</label>
+                        <input type="text" class="form-control" name="rfid" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Type</label>
+                        <select class="form-select" name="type" required>
+                            <!-- Will be populated dynamically -->
+                        </select>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Age</label>
+                        <input type="number" class="form-control" name="age" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Birth Date</label>
+                        <input type="date" class="form-control" name="birthDate" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Gender</label>
+                        <select class="form-select" name="gender" required>
+                            <option value="male">Male</option>
+                            <option value="female">Female</option>
+                        </select>
+                    </div>
+                </form>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-success" onclick="submitAddAnimal()">Add Animal</button>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+<script>
+// Prepare animal type data for the chart
+const animalTypeCounts = {{ animal_type_counts|tojson }};
+
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('animalTypeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(animalTypeCounts),
+            datasets: [{
+                data: Object.values(animalTypeCounts),
+                backgroundColor: [
+                    '#388e3c', '#43a047', '#66bb6a', '#81c784', '#a5d6a7', '#c8e6c9', '#e8f5e9'
+                ],
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { color: '#388e3c' }
+                }
+            }
+        }
+    });
+});
+
+// Load animal types for the select dropdown
+function loadAnimalTypes() {
+    fetch('/types')
+        .then(response => response.json())
+        .then(types => {
+            const select = document.querySelector('select[name="type"]');
+            select.innerHTML = '';
+            types.forEach(type => {
+                const option = document.createElement('option');
+                option.value = type.id;
+                option.textContent = type.name;
+                select.appendChild(option);
+            });
+        });
+}
+
+// Show add animal modal
+function showAddAnimal() {
+    loadAnimalTypes();
+    new bootstrap.Modal(document.getElementById('addAnimalModal')).show();
+}
+
+// Submit new animal
+function submitAddAnimal() {
+    const form = document.getElementById('addAnimalForm');
+    const formData = new FormData(form);
+    const data = Object.fromEntries(formData.entries());
+    
+    fetch('/animals', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.id) {
+            location.reload();
+        } else {
+            alert(data.error || 'Failed to add animal');
+        }
+    });
+}
+
+// Edit animal
+function editAnimal(id) {
+    // Implement edit functionality
+    alert('Edit functionality coming soon!');
+}
+
+// Delete animal
+function deleteAnimal(id) {
+    if (confirm('Are you sure you want to delete this animal?')) {
+        fetch(`/animals/${id}`, {
+            method: 'DELETE'
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.message) {
+                location.reload();
+            } else {
+                alert(data.error || 'Failed to delete animal');
+            }
+        });
+    }
+}
+
+// View device details
+function viewDeviceDetails(id) {
+    // Implement device details view
+    alert('Device details view coming soon!');
+}
+
+// Initialize
+// (other initialization code can go here)
+</script>
+{% endblock %} 

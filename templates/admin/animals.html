@@ -1,0 +1,62 @@
+{% extends "base.html" %}
+
+{% block title %}All Animals - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4" style="color:#388e3c;">All Animals</h2>
+    <div class="card" style="border-top: 3px solid #388e3c;">
+        <div class="card-header" style="background:#e8f5e9; color:#388e3c;">
+            <h5 class="mb-0">Animals List</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead style="background:#c8e6c9;">
+                        <tr>
+                            <th>Name</th>
+                            <th>RFID</th>
+                            <th>Type</th>
+                            <th>Owner</th>
+                            <th>Status</th>
+                            <th>Birth Date</th>
+                            <th>Last Updated</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for animal in animals %}
+                        <tr>
+                            <td>{{ animal.name }}</td>
+                            <td>{{ animal.rfid }}</td>
+                            <td>{{ animal.type_name }}</td>
+                            <td>{{ animal.owner_name }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'success' if animal.status == 'verified' else 'warning' }}">
+                                    {{ animal.status }}
+                                </span>
+                            </td>
+                            <td>
+                              {% set birth = animal.birthDate if 'birthDate' in animal else (animal.birthdate if 'birthdate' in animal else None) %}
+                              {% if birth %}
+                                {{ birth.strftime('%Y-%m-%d') }}
+                              {% else %}
+                                Unknown
+                              {% endif %}
+                            </td>
+                            <td>
+                              {% set updated = animal.updated_at if 'updated_at' in animal else (animal.updatedAt if 'updatedAt' in animal else None) %}
+                              {% if updated %}
+                                {{ updated.strftime('%Y-%m-%d %H:%M') }}
+                              {% else %}
+                                Unknown
+                              {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

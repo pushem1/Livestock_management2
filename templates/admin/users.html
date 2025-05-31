@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+
+{% block title %}All Users - Admin{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4" style="color:#388e3c;">All Users (Farmers)</h2>
+    <div class="card" style="border-top: 3px solid #388e3c;">
+        <div class="card-header" style="background:#e8f5e9; color:#388e3c;">
+            <h5 class="mb-0">Users List</h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead style="background:#c8e6c9;">
+                        <tr>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Role</th>
+                            <th>Animal Count</th>
+                            <th>Registered</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for user in users %}
+                        <tr>
+                            <td>{{ user.name }}</td>
+                            <td>{{ user.email }}</td>
+                            <td>
+                                <span class="badge bg-{{ 'primary' if user.role == 'admin' else 'secondary' }}">
+                                    {{ user.role }}
+                                </span>
+                            </td>
+                            <td>{{ user.animal_count }}</td>
+                            <td>
+                              {% set created = user.created_at if 'created_at' in user else (user.createdAt if 'createdAt' in user else None) %}
+                              {% if created %}
+                                {{ created.strftime('%Y-%m-%d') }}
+                              {% else %}
+                                Unknown
+                              {% endif %}
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

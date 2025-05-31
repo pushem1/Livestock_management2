@@ -1,0 +1,204 @@
+{% extends "base.html" %}
+
+{% block title %}Admin Dashboard - Livestock Management{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <h2 class="mb-4" style="color:#388e3c;">Admin Dashboard</h2>
+    
+    <!-- Animal Type Statistics Chart -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <div class="card shadow-sm" style="border-left: 5px solid #43a047;">
+                <div class="card-body">
+                    <h5 class="card-title" style="color:#388e3c;">Animal Type Distribution</h5>
+                    <canvas id="animalTypeChart" height="180"></canvas>
+                </div>
+            </div>
+        </div>
+        <!-- Statistics Cards -->
+        <div class="col-md-6">
+            <div class="row">
+                <div class="col-md-6 mb-3">
+                    <div class="card text-white" style="background:#388e3c;">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Users</h5>
+                            <h2 class="card-text">{{ stats.total_users }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card text-white" style="background:#43a047;">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Animals</h5>
+                            <h2 class="card-text">{{ stats.total_animals }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card text-white" style="background:#66bb6a;">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Devices</h5>
+                            <h2 class="card-text">{{ stats.total_devices }}</h2>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6 mb-3">
+                    <div class="card text-white" style="background:#81c784;">
+                        <div class="card-body">
+                            <h5 class="card-title">Active Devices</h5>
+                            <h2 class="card-text">{{ stats.active_devices }}</h2>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Recent Activities -->
+    <div class="row">
+        <!-- Recent Animals -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header" style="background:#e8f5e9; color:#388e3c;">
+                    <h5 class="card-title mb-0">Recent Animals</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead style="background:#c8e6c9;">
+                                <tr>
+                                    <th>RFID</th>
+                                    <th>Type</th>
+                                    <th>Status</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for animal in stats.recent_animals %}
+                                <tr>
+                                    <td>{{ animal.rfid }}</td>
+                                    <td>{{ animal.type_name }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if animal.status == 'verified' else 'warning' }}">
+                                            {{ animal.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                      {% set created = animal.created_at if 'created_at' in animal else (animal.createdAt if 'createdAt' in animal else None) %}
+                                      {% if created %}
+                                        {{ created.strftime('%Y-%m-%d') }}
+                                      {% else %}
+                                        Unknown
+                                      {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Recent Users -->
+        <div class="col-md-6">
+            <div class="card">
+                <div class="card-header" style="background:#e8f5e9; color:#388e3c;">
+                    <h5 class="card-title mb-0">Recent Users</h5>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead style="background:#c8e6c9;">
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Email</th>
+                                    <th>Role</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in stats.recent_users %}
+                                <tr>
+                                    <td>{{ user.name }}</td>
+                                    <td>{{ user.email }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'primary' if user.role == 'admin' else 'secondary' }}">
+                                            {{ user.role }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                      {% set created = user.created_at if 'created_at' in user else (user.createdAt if 'createdAt' in user else None) %}
+                                      {% if created %}
+                                        {{ created.strftime('%Y-%m-%d') }}
+                                      {% else %}
+                                        Unknown
+                                      {% endif %}
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.3.0/dist/chart.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js"></script>
+<script>
+const animalTypeCounts = {{ animal_type_counts|tojson }};
+const animalTypeColors = {{ animal_type_colors|tojson }};
+const chartColors = Object.keys(animalTypeCounts).map(type => animalTypeColors[type] || '#BDBDBD');
+document.addEventListener('DOMContentLoaded', function() {
+    const ctx = document.getElementById('animalTypeChart').getContext('2d');
+    new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+            labels: Object.keys(animalTypeCounts),
+            datasets: [{
+                data: Object.values(animalTypeCounts),
+                backgroundColor: chartColors,
+                borderWidth: 2
+            }]
+        },
+        options: {
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: { color: '#388e3c' }
+                }
+            }
+        }
+    });
+
+    // Real-time notifications
+    const socket = io();
+    function showToast(message) {
+        let toast = document.createElement('div');
+        toast.className = 'position-fixed top-0 end-0 p-3';
+        toast.style.zIndex = 9999;
+        toast.innerHTML = `<div class='toast align-items-center text-bg-success border-0 show' role='alert' aria-live='assertive' aria-atomic='true'>
+            <div class='d-flex'>
+                <div class='toast-body'>${message}</div>
+                <button type='button' class='btn-close btn-close-white me-2 m-auto' data-bs-dismiss='toast' aria-label='Close'></button>
+            </div>
+        </div>`;
+        document.body.appendChild(toast);
+        setTimeout(() => { toast.remove(); }, 6000);
+    }
+    socket.on('animal_found', function(data) {
+        showToast('Animal found: ' + data.animal.name + ' (RFID: ' + data.rfid + ')');
+    });
+    socket.on('status_updated', function(data) {
+        showToast('Animal status updated: ' + data.rfid + ' → ' + data.status);
+    });
+});
+</script>
+{% endblock %} 
